@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Feliz día de las flores amarillas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Yellowtail&display=swap" rel="stylesheet">
+<style>
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: Georgia, serif;
+    color: #1c1c1c;
+    padding: 24px;
+    box-sizing: border-box;
+    overflow-x: hidden;
+    position: relative;
+  }
+
+  /* Botón del inicio */
+  #boton {
+    font: inherit;
+    font-size: 28px;
+    padding: 16px 34px;
+    background: #fff;
+    color: #1c1c1c;
+    border: 2px solid #e9a20f;
+    border-radius: 999px;
+    cursor: pointer;
+    animation: latido 1.6s ease-in-out infinite;
+    position: relative;
+    z-index: 2;
+  }
+  #boton:hover { background: #fff3c9; }
+  @keyframes latido {
+    50% { transform: scale(1.06); }
+  }
+
+  /* Tarjeta con dos columnas: texto a la izquierda, corazón a la derecha */
+  #tarjeta {
+    display: none;
+    width: min(94vw, 920px);
+    align-items: center;
+    gap: 5%;
+    position: relative;
+    z-index: 1;
+  }
+  #tarjeta.lista { display: flex; }
+  @media (max-width: 720px) {
+    #tarjeta.lista { flex-direction: column; }
+  }
+
+  #texto { flex: 1 1 320px; min-width: 260px; }
+  #titulo {
+    margin: 0 0 0.7em;
+    font-size: clamp(20px, 3vw, 27px);
+    font-weight: bold;
+  }
+  #parrafo {
+    margin: 0 0 1.3em;
+    font-size: clamp(15px, 2.1vw, 18px);
+    line-height: 1.65;
+  }
+  #firma {
+    margin: 0;
+    text-align: right;
+    font-family: "Yellowtail", "Brush Script MT", cursive;
+    font-size: clamp(18px, 3vw, 25px);
+    opacity: 0;
+    transition: opacity 1s ease;
+  }
+  #firma.visible { opacity: 1; }
+
+  #teamo {
+    margin: 0.7em 0 0;
+    font-family: "Yellowtail", "Brush Script MT", cursive;
+    font-size: clamp(34px, 6.5vw, 56px);
+    font-weight: normal;
+    color: #1c1c1c;
+    text-align: center;
+    letter-spacing: 0.02em;
+    opacity: 0;
+    transform: scale(0.4);
+  }
+  #teamo.visible {
+    animation:
+      apareceTeAmo 0.8s cubic-bezier(.34,1.56,.64,1) forwards,
+      latido 1.6s ease-in-out infinite 0.9s;
+  }
+  @keyframes apareceTeAmo {
+    to { opacity: 1; transform: scale(1); }
+  }
+
+  /* Cursor de "escribiendo" para el título y el párrafo */
+  .escribiendo::after {
+    content: "";
+    display: inline-block;
+    width: 2px;
+    height: 1em;
+    margin-left: 2px;
+    background: #1c1c1c;
+    vertical-align: -0.15em;
+    animation: parpadeo 0.8s steps(1) infinite;
+  }
+  @keyframes parpadeo {
+    50% { opacity: 0; }
+  }
+
+  /* Escena: corazón, tallo y suelo */
+  #escena {
+    position: relative;
+    flex: 0 0 auto;
+    --lado: min(98vw, 560px);   /* tamaño del corazón de girasoles: más grande */
+    width: var(--lado);
+    height: calc(var(--lado) + 285px);
+    max-width: 100%;
+  }
+  #corazon {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    aspect-ratio: 1;
+    z-index: 1;                 /* las flores quedan por encima del tallo */
+  }
+
+  /* Cada girasol cae como una hoja: baja, se mece de lado a lado y gira */
+  #corazon span {
+    position: absolute;
+    opacity: 0;
+    animation: caer 1.4s ease-in forwards;
+  }
+  @keyframes caer {
+    0%   { transform: translate(-50%, -50%) translate(var(--dx), var(--dy)) rotate(var(--rot)) scale(0.8); opacity: 0; }
+    12%  { opacity: 1; }
+    55%  { transform: translate(-50%, -50%) translate(calc(var(--dx) * -0.55), calc(var(--dy) * 0.5)) rotate(calc(var(--rot) * -0.6)) scale(1.05); }
+    100% { transform: translate(-50%, -50%) translate(0, 0) rotate(0deg) scale(1); opacity: 1; }
+  }
+
+  #tallo {
+    position: absolute;
+    left: 50%;
+    bottom: 0;
+    width: 15px;
+    height: 285px;               /* tamaño fijo: no cambia aunque el corazón crezca */
+    background: linear-gradient(90deg, #1f7a68, #2e9a84, #1f7a68);
+    border-radius: 4px 4px 0 0;
+    transform: translateX(-50%) scaleY(0);
+    transform-origin: bottom;
+  }
+  #tallo.crece { animation: crecer 2.4s ease-out forwards; }
+  @keyframes crecer {
+    to { transform: translateX(-50%) scaleY(1); }
+  }
+
+  #suelo {
+    position: absolute;
+    left: -20%;
+    right: -20%;
+    bottom: 0;
+    height: 2px;
+    background: #1c1c1c;
+  }
+
+  /* Lluvia continua de girasoles cayendo como hojas, de fondo en toda la página */
+  #lluvia {
+    position: fixed;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+    z-index: 0;
+  }
+  #lluvia span {
+    position: absolute;
+    top: -10%;
+    opacity: 0;
+    animation-name: hojaCae;
+    animation-timing-function: linear;
+    animation-fill-mode: forwards;
+  }
+  @keyframes hojaCae {
+    0%   { transform: translate(0, 0) rotate(0deg); opacity: 0; }
+    8%   { opacity: 0.85; }
+    25%  { transform: translate(var(--sway), 25vh) rotate(90deg); }
+    50%  { transform: translate(calc(var(--sway) * -1), 50vh) rotate(180deg); }
+    75%  { transform: translate(var(--sway), 75vh) rotate(270deg); }
+    100% { transform: translate(0, 115vh) rotate(360deg); opacity: 0.85; }
+  }
+</style>
+</head>
+<body>
+  <div id="lluvia"></div>
+
+  <button id="boton">Haz click aquí</button>
+
+  <div id="tarjeta">
+    <div id="escena">
+      <div id="corazon"></div>
+      <div id="tallo"></div>
+      <div id="suelo"></div>
+    </div>
+    <div id="texto">
+      <h1 id="titulo"></h1>
+      <p id="parrafo"></p>
+      <p id="firma"></p>
+      <p id="teamo">TE AMO</p>
+    </div>
+  </div>
+
+<script>
+  const boton   = document.getElementById("boton");
+  const tarjeta = document.getElementById("tarjeta");
+  const tallo   = document.getElementById("tallo");
+  const caja    = document.getElementById("corazon");
+  const titulo  = document.getElementById("titulo");
+  const parrafo = document.getElementById("parrafo");
+  const firma   = document.getElementById("firma");
+  const teamo   = document.getElementById("teamo");
+  const lluvia  = document.getElementById("lluvia");
+
+  const TITULO = "🌻 Feliz día de las flores amarillas 🌻";
+  const PARRAFO = "Cada girasol que ves aquí es un latido en mi corazón. Así como el sol ilumina los campos, tú iluminas mi vida. Que estas flores te recuerden lo especial que eres para mí.";
+  const FIRMA = "Eres el sol que hace florecer cada uno de mis días";
+
+  // Escribe un texto letra por letra dentro de un elemento (con cursor parpadeante) y avisa cuando termina
+  function escribir(elemento, texto, velocidad, alTerminar) {
+    const letras = [...texto];
+    let n = 0;
+    elemento.classList.add("escribiendo");
+    const intervalo = setInterval(() => {
+      n++;
+      elemento.textContent = letras.slice(0, n).join("");
+      if (n === letras.length) {
+        clearInterval(intervalo);
+        elemento.classList.remove("escribiendo");
+        if (alTerminar) alTerminar();
+      }
+    }, velocidad);
+  }
+
+  // Los girasoles caen como hojas (desde arriba, con vaivén) hasta formar el corazón.
+  // Devuelve, en milisegundos, cuánto tarda en terminar de caer el último girasol.
+  function crecerCorazon() {
+    const ancho = caja.clientWidth;
+    const paso = 0.11;                  // distancia entre girasoles
+    const tamano = (paso / 2.8) * ancho * 1.5;
+    const puntos = [];
+
+    for (let j = 12; j >= -11; j--) {          // filas, de arriba hacia abajo
+      const y = j * paso;
+      for (let i = -12; i <= 12; i++) {        // columnas, de izquierda a derecha
+        const x = i * paso;
+        // Fórmula matemática del corazón: si el punto cae adentro, va un girasol
+        const dentro = Math.pow(x * x + y * y - 1, 3) - x * x * y * y * y <= 0;
+        if (dentro) puntos.push({ x, y });
+      }
+    }
+
+    // orden aleatorio, para que no caigan todas en fila
+    puntos.sort(() => Math.random() - 0.5);
+
+    const RETRASO_MAX = 3400;   // ms en los que se reparten las caídas
+    const DURACION = 1400;      // ms que tarda cada girasol en caer (ver "caer" en CSS)
+
+    puntos.forEach((p, indice) => {
+      const flor = document.createElement("span");
+      flor.textContent = "🌻";
+      flor.style.fontSize = tamano + "px";
+      flor.style.left = ((p.x + 1.4) / 2.8) * 100 + "%";
+      flor.style.top = (((1.4 - p.y) / 2.8) + 0.143) * 100 + "%"; // +0.143: baja el corazón para que su punta toque el tallo
+
+      // vaivén y giro aleatorios, como una hoja al caer
+      flor.style.setProperty("--dx", (Math.random() * 70 - 35) + "px");
+      flor.style.setProperty("--dy", -(120 + Math.random() * 120) + "px");
+      flor.style.setProperty("--rot", (Math.random() * 70 - 35) + "deg");
+
+      flor.style.animationDelay = (indice / puntos.length) * RETRASO_MAX + "ms";
+      caja.appendChild(flor);
+    });
+
+    return RETRASO_MAX + DURACION;
+  }
+
+  // Crea un girasol que cae como una hoja en toda la página, de fondo, en loop
+  function crearHojaDeFondo() {
+    const flor = document.createElement("span");
+    flor.textContent = "🌻";
+    const tamano = 18 + Math.random() * 22;
+    flor.style.fontSize = tamano + "px";
+    flor.style.left = Math.random() * 100 + "%";
+    flor.style.setProperty("--sway", (40 + Math.random() * 90) * (Math.random() < 0.5 ? -1 : 1) + "px");
+    const duracion = 9 + Math.random() * 8;
+    flor.style.animationDuration = duracion + "s";
+    lluvia.appendChild(flor);
+    setTimeout(() => flor.remove(), duracion * 1000 + 200);
+  }
+
+  let lluviaIntervalo = null;
+  function iniciarLluviaDeFondo() {
+    if (lluviaIntervalo) return;
+    // algunas al arrancar, para que no se sienta vacío
+    for (let i = 0; i < 4; i++) setTimeout(crearHojaDeFondo, i * 400);
+    lluviaIntervalo = setInterval(crearHojaDeFondo, 650);
+  }
+
+  // Al hacer click: se va el botón y arranca toda la secuencia
+  boton.addEventListener("click", () => {
+    boton.style.display = "none";
+    tarjeta.classList.add("lista");
+
+    const PAUSA_RAYA = 1600; // ms que se ve solo la raya negra antes de que crezca el tallo
+
+    // 1) primero se ve un buen rato solo la raya negra, y recién después crece el tallo
+    setTimeout(() => {
+      tallo.classList.add("crece");
+
+      // 2) cuando termina de crecer el tallo, empiezan a caer los girasoles y a formar el corazón
+      setTimeout(() => {
+        const duracionCorazon = crecerCorazon();
+
+        // 3) cuando el corazón queda formado, se escribe el título
+        setTimeout(() => {
+          escribir(titulo, TITULO, 55, () => {
+            // 4) luego se escribe el mensaje
+            escribir(parrafo, PARRAFO, 22, () => {
+              // 5) al final aparece la firma en cursiva
+              firma.textContent = FIRMA;
+              setTimeout(() => {
+                firma.classList.add("visible");
+                // 6) y arranca la lluvia continua de girasoles de fondo en toda la página
+                iniciarLluviaDeFondo();
+                // 7) por último, aparece "TE AMO"
+                setTimeout(() => teamo.classList.add("visible"), 900);
+              }, 300);
+            });
+          });
+        }, duracionCorazon + 200);
+      }, 2400); // 2400ms = duración de la animación "crecer" del tallo (lenta)
+    }, PAUSA_RAYA);
+  });
+</script>
+</body>
+</html>
